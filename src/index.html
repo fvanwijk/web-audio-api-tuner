@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Web Audio API tuner</title>
-    <style>
-      body {
-        font-family: Helvetica, sans-serif;
-      }
-    </style>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
-  </head>
-  <body>
-    <h2>Frequency analysis</h2>
-    <canvas width="1000" height="200"></canvas>
 
-    <h2>Harmonics tuning</h2>
-    <div id="harmonics"></div>
+<head>
+  <meta charset="UTF-8">
+  <title>Web Audio API tuner</title>
+  <style>
+    body {
+      font-family: Helvetica, sans-serif;
+    }
+  </style>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+</head>
 
-    <script src="harmonics.js"></script>
-    <script src="tuner.js"></script>
-  </body>
+<body>
+  <h2>Frequency analysis</h2>
+  <canvas width="1000" height="200"></canvas>
+  <svg id="scale"></svg>
+
+  <h2>Harmonics tuning</h2>
+  <div id="harmonics"></div>
+
+  <script src="harmonics.js"></script>
+  <script src="tuner.js"></script>
+  <div id="freq"></div>
+  <div id="freq-corrl"></div>
+</body>
+
 </html>
