@@ -47,7 +47,6 @@ function visualize(stream) {
     .append('g')
     .call(d3.axisBottom(scale));
 
-  console.log(bufferLength);
   const dataArray = new Uint8Array(bufferLength);
 
   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -72,7 +71,7 @@ function visualize(stream) {
     for (let i = 0; i < bufferLength; i++) {
       barHeight = dataArray[i];
 
-      canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',0,0)';
+      canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + '',0,0)'';
       canvasCtx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
 
       x += barWidth + 1;
