@@ -36,9 +36,9 @@ function findFundamentalFreq(buffer, sampleRate) {
   // Source: http://www.phy.mty.edu/~suits/autocorrelation.html
   // Assuming the sample rate is 48000Hz, a 'k' equal to 1000 would correspond to a 48Hz signal (48000/1000 = 48),
   // while a 'k' equal to 8 would correspond to a 6000Hz one, which is enough to cover most (if not all)
-  var n = 1024,
-    bestR = 0,
-    bestK = -1;
+  var n = 1024;
+  let rs = Array.from({ length: 1000 });
+
   for (var k = 8; k <= 1000; k++) {
     var sum = 0;
 
@@ -47,25 +47,21 @@ function findFundamentalFreq(buffer, sampleRate) {
     }
 
     var r = sum / (n + k);
-
-    if (r > bestR) {
-      bestR = r;
-      bestK = k;
-    }
+    rs[k] = { k, r };
 
     if (r > 0.9) {
       // Let's assume that this is good enough and stop right here
       break;
     }
   }
-
-  if (bestR > 0.0025 && bestK !== 8) {
+  rs.sort((a, b) => b.r - a.r);
+  if (rs[0].r > 0.0025 && rs[0].k !== 8) {
     // The period (in frames) of the fundamental frequency is 'bestK'. Getting the frequency from there is trivial.
-    var fundamentalFreq = sampleRate / bestK;
+    var fundamentalFreq = sampleRate / rs[0].k;
     return fundamentalFreq;
   } else {
     // We haven't found a good correlation
-    return -1;
+    return undefined;
   }
 }
 
@@ -105,7 +101,7 @@ function visualize(stream) {
     analyser.getByteTimeDomainData(buffer);
     var fundalmentalFreq = findFundamentalFreq(buffer, audioCtx.sampleRate);
 
-    if (fundalmentalFreq !== -1) {
+    if (fundalmentalFreq !== undefined) {
       // var note = findClosestNote(fundalmentalFreq, notesArray); // See the 'Finding the right note' section.
       // var cents = findCentsOffPitch(fundalmentalFreq, note.frequency); // See the 'Calculating the cents off pitch' section.
       freqCorrl.innerText = `AutoCorrelated to ${fundalmentalFreq}`; // Function that updates the note on the page (see demo source code).
