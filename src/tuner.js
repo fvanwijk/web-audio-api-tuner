@@ -1,8 +1,8 @@
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // define audio context
 // Webkit/blink browsers need prefix, Safari won't work without window.
 
-const canvas = document.querySelector("canvas");
-const canvasCtx = canvas.getContext("2d");
+const canvas = document.querySelector('canvas');
+const canvasCtx = canvas.getContext('2d');
 
 let drawVisual; // requestAnimationFrame
 
@@ -24,7 +24,7 @@ navigator.getUserMedia(
     visualize(stream);
   },
   err => {
-    console.log("The following gUM error occured: " + err);
+    console.log('The following gUM error occured: ' + err);
   }
 );
 
@@ -41,10 +41,10 @@ function visualize(stream) {
     .domain([0, audioCtx.sampleRate]);
 
   d3
-    .select("#scale")
-    .attr("width", WIDTH)
-    .attr("height", 30)
-    .append("g")
+    .select('#scale')
+    .attr('width', WIDTH)
+    .attr('height', 30)
+    .append('g')
     .call(d3.axisBottom(scale));
 
   console.log(bufferLength);
@@ -57,7 +57,12 @@ function visualize(stream) {
 
     analyser.getByteFrequencyData(dataArray);
 
-    canvasCtx.fillStyle = "rgb(0, 0, 0)";
+    const peak = dataArray.reduce(
+      (memo, value, index) => (value > memo.value ? { value, index } : memo),
+      { value: -1, index: 0 }
+    );
+
+    canvasCtx.fillStyle = 'rgb(0, 0, 0)';
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
     const barWidth = WIDTH / bufferLength * 2.5;
@@ -67,7 +72,7 @@ function visualize(stream) {
     for (let i = 0; i < bufferLength; i++) {
       barHeight = dataArray[i];
 
-      canvasCtx.fillStyle = "rgb(" + (barHeight + 100) + ",0,0)";
+      canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',0,0)';
       canvasCtx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
 
       x += barWidth + 1;
