@@ -1,9 +1,8 @@
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // define audio context
 // Webkit/blink browsers need prefix, Safari won't work without window.
 
-const canvas = document.querySelector('canvas');
+const canvas = document.querySelector("canvas");
 const canvasCtx = canvas.getContext("2d");
-
 
 let drawVisual; // requestAnimationFrame
 
@@ -12,7 +11,7 @@ const distortion = audioCtx.createWaveShaper();
 const gainNode = audioCtx.createGain();
 const biquadFilter = audioCtx.createBiquadFilter();
 
-navigator.getUserMedia (
+navigator.getUserMedia(
   { audio: true },
   stream => {
     source = audioCtx.createMediaStreamSource(stream);
@@ -25,7 +24,7 @@ navigator.getUserMedia (
     visualize(stream);
   },
   err => {
-    console.log('The following gUM error occured: ' + err);
+    console.log("The following gUM error occured: " + err);
   }
 );
 
@@ -33,8 +32,21 @@ function visualize(stream) {
   WIDTH = canvas.width;
   HEIGHT = canvas.height;
 
-  analyser.fftSize = 2**9;
+  analyser.fftSize = 2 ** 11;
   const bufferLength = analyser.frequencyBinCount;
+
+  const scale = d3
+    .scaleLinear()
+    .range([0, WIDTH])
+    .domain([0, audioCtx.sampleRate]);
+
+  d3
+    .select("#scale")
+    .attr("width", WIDTH)
+    .attr("height", 30)
+    .append("g")
+    .call(d3.axisBottom(scale));
+
   console.log(bufferLength);
   const dataArray = new Uint8Array(bufferLength);
 
@@ -45,17 +57,17 @@ function visualize(stream) {
 
     analyser.getByteFrequencyData(dataArray);
 
-    canvasCtx.fillStyle = 'rgb(0, 0, 0)';
+    canvasCtx.fillStyle = "rgb(0, 0, 0)";
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-    const barWidth = (WIDTH / bufferLength) * 2.5;
+    const barWidth = WIDTH / bufferLength * 2.5;
     let barHeight;
     let x = 0;
 
     for (let i = 0; i < bufferLength; i++) {
       barHeight = dataArray[i];
 
-      canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',0,0)';
+      canvasCtx.fillStyle = "rgb(" + (barHeight + 100) + ",0,0)";
       canvasCtx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
 
       x += barWidth + 1;
