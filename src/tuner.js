@@ -72,7 +72,10 @@ function visualize(stream) {
   analyser.fftSize = 2 ** 12;
   const bufferLength = analyser.frequencyBinCount;
 
-  const scale = d3
+  const blue = d3.schemeBlues[9];
+  const colorScale = d3.scaleLinear().domain([128, 0]).range([blue[0], blue[blue.length-1]]);
+
+  const xScale = d3
     .scaleLinear()
     .range([0, WIDTH])
     .domain([0, audioCtx.sampleRate]);
@@ -82,9 +85,8 @@ function visualize(stream) {
     .attr('width', WIDTH)
     .attr('height', 30)
     .append('g')
-    .call(d3.axisBottom(scale));
+    .call(d3.axisBottom(xScale));
 
-  console.log(bufferLength);
   const dataArray = new Uint8Array(bufferLength);
   const binRange = audioCtx.sampleRate / bufferLength;
   canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -124,8 +126,7 @@ function visualize(stream) {
 
     for (let i = 0; i < bufferLength; i++) {
       barHeight = dataArray[i];
-
-      canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ',0,0)';
+      canvasCtx.fillStyle = colorScale(barHeight / 2);
       canvasCtx.fillRect(x, HEIGHT - barHeight / 2, barWidth, barHeight / 2);
 
       x += barWidth + 1;
