@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>Web Audio API tuner</h1>
+    <FrequencyTable />
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import FrequencyTable from "./components/FrequencyTable.vue";
 
 export default {
-  name: "app",
+  name: 'app',
   components: {
-    HelloWorld
+    FrequencyTable
   }
 };
 </script>
