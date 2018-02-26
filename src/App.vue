@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import FrequencyTable from "./components/FrequencyTable.vue";
+import FrequencyTable from './components/FrequencyTable.vue';
 
 export default {
   name: 'app',
