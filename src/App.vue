@@ -2,17 +2,22 @@
   <div id="app">
     <div class="container">
       <h1>Web Audio API tuner</h1>
+      <h2>Frequency spectrum</h2>
+      <FrequencySpectrum />
+      <h2>Frequencies of harmonics</h2>
       <FrequencyTable />
     </div>
   </div>
 </template>
 
 <script>
+import FrequencySpectrum from './components/FrequencySpectrum.vue';
 import FrequencyTable from './components/FrequencyTable.vue';
 
 export default {
   name: 'app',
   components: {
+    FrequencySpectrum,
     FrequencyTable
   }
 };
