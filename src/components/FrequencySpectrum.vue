@@ -23,7 +23,7 @@
       const gainNode = audioCtx.createGain();
       gainNode.gain.value = 0;
 
-      navigator.getUserMedia(
+      (navigator.getUserMedia || navigator.mozGetUserMedia).call(navigator,
         { audio: true },
         stream => {
           source = audioCtx.createMediaStreamSource(stream);
