@@ -26,8 +26,42 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+.container {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+}
+
+/* Mobile */
+@media only screen and (max-width: 767px) {
   .container {
-    margin: 0 auto;
-    width: 1440px;
+    width: auto;
+    margin-left: 1em;
+    margin-right: 1em;
   }
+}
+
+/* Tablet */
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    width: 719px;
+  }
+}
+
+/* Small Monitor */
+@media only screen and (min-width: 1024px) and (max-width: 1279px) {
+  .container {
+    width: 959px;
+  }
+}
+
+/* Large Monitor */
+@media only screen and (min-width: 1280px) {
+  .container {
+    width: 1199px;
+  }
+}
+
 </style>
