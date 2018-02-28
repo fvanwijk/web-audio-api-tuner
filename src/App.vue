@@ -4,8 +4,14 @@
       <h1>Web Audio API tuner</h1>
 
       <h2>Frequency spectrum</h2>
-      <FrequencySpectrum :fft-size="8" />
-      <svg width="100%" height="60"></svg>
+
+      <FrequencySpectrum :fft-size="fftSize" :type="spectrumType" />
+      <svg width="100%" height="20"></svg>
+      <div class="controls">
+        <label><input type="radio" v-model="spectrumType" value="bar" /> Bar</label>
+        <label><input type="radio" v-model="spectrumType" value="line" /> Line</label>
+        <label><input type="range" min="5" max="15" v-model.number="fftSize" /> FFT size</label>
+      </div>
 
       <h2>Frequencies of harmonics</h2>
       <FrequencyTable />
@@ -26,6 +32,12 @@ export default {
   components: {
     FrequencySpectrum,
     FrequencyTable
+  },
+  data() {
+    return {
+      fftSize: 5,
+      spectrumType: 'bar'
+    };
   },
   async mounted() {
     const width = select('svg').node().clientWidth;
@@ -97,5 +109,9 @@ export default {
   }
   .axis text {
     color: #2c3e50;
+  }
+
+  .controls {
+    float: right;
   }
 </style>
