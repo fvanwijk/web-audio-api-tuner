@@ -6,7 +6,6 @@
       <h2>Frequency spectrum</h2>
 
       <FrequencySpectrum :fft-size="fftSize" :type="spectrumType" />
-      <svg width="100%" height="20"></svg>
       <div class="controls">
         <label><input type="radio" v-model="spectrumType" value="bar" /> Bar</label>
         <label><input type="radio" v-model="spectrumType" value="line" /> Line</label>
@@ -40,15 +39,7 @@ export default {
     };
   },
   async mounted() {
-    const width = select('svg').node().clientWidth;
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    const xScale = scaleLinear().domain([0, audioCtx.sampleRate]).range([0, width]);
-    const xAxis = axisBottom(xScale);
-    select('svg')
-      .append('g')
-      .attr('class', 'axis')
-      .call(xAxis);
   }
 };
 </script>

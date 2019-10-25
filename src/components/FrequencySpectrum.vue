@@ -1,75 +1,90 @@
 <template>
-  <canvas style="width: 100%" height="300"></canvas>
+  <div>
+    <canvas style="width: 100%" height="300"></canvas>
+    <svg width="100%" height="20"></svg>
+  </div>
 </template>
 
 <script>
-  import { scaleLinear } from 'd3-scale';
+  import { axisBottom } from 'd3-axis';
+  import { range } from 'd3-array';
+  import { scaleBand, scaleLinear } from 'd3-scale';
+  import { select } from 'd3-selection';
   import { getFFTanalyser } from '../AudioService';
 
   export default {
     name: 'FrequencySpectrum',
     data() {
       return {
-        drawVisual: undefined // requestAnimationFrame
+        drawVisual: undefined, // requestAnimationFrame
+        xBarScale: scaleBand().padding(0.1)
       }
     },
     methods: {
+      init() {
+        getFFTanalyser().then(analyser => {
+          this.visualize(analyser);
+
+          select('.axis').call(axisBottom(this.xBarScale));
+        });
+      },
       visualize(analyser) {
-        const canvas = this.$el;
+        const canvas = this.$el.getElementsByTagName('canvas')[0];
         const canvasCtx = canvas.getContext('2d');
         const WIDTH = canvas.offsetWidth;
         const HEIGHT = canvas.offsetHeight;
 
-        const colorScale = scaleLinear().domain([0, 255]).range([0.3, 1]);
-        const yScale = scaleLinear().domain([0, 255]).range([0, HEIGHT]);
-
         analyser.fftSize = 2 ** this.fftSize;
         analyser.maxDecibels = -10;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
+        const binCount = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(binCount);
         canvasCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+        const sampleRate = 44100;
+        const binSize = sampleRate / binCount;
+        const freqs = range(binCount).map(d => (d + 1) * binSize);
+
+        this.xBarScale.domain(freqs).range([0, WIDTH]);
+        const xScale = scaleLinear().domain([0, sampleRate]).range([0, WIDTH]);
+        const yScale = scaleLinear().domain([0, 255]).rangeRound([HEIGHT, 0]);
+        const colorScale = scaleLinear().domain([0, 255]).range([0.5, 1]);
+
 
         const draw = () => {
           this.drawVisual = requestAnimationFrame(draw);
 
           analyser.getByteFrequencyData(dataArray);
 
-          const binWidth = (WIDTH / bufferLength);
-
           // Clear canvas every frame
           canvasCtx.fillStyle = 'white';
           canvasCtx.fillRect(0, 0, WIDTH, HEIGHT + 1);
 
-          let x = 0;
+          // Preprocess data
+          const freqData = Array.from(dataArray).map((val, i) => {
+            return {
+              freq: (i+1) * binSize,
+              value: val
+            };
+          });
+
+          // Draw chart
           if (this.type === 'bar') {
-
-            for (let i = 0; i < bufferLength; i++) {
-              const value = dataArray[i];
-              if (i === 0) {
-                //console.log(value, yScale(value)) // value 255, 298
-              }
-
-              canvasCtx.fillStyle = `rgba(127,0,0,${colorScale(value)})`;
-              canvasCtx.fillRect(x, HEIGHT - yScale(value), binWidth, yScale(value));
-
-              x += binWidth + 1;
-            }
+            freqData.forEach(d => {
+              canvasCtx.fillStyle = `rgba(127,0,0,${colorScale(d.value)})`;
+              canvasCtx.fillRect(this.xBarScale(d.freq), yScale(d.value), this.xBarScale.bandwidth(), HEIGHT - yScale(d.value));
+            });
           } else {
             canvasCtx.lineWidth = 1;
             canvasCtx.strokeStyle = '#2c3e50';
-
             canvasCtx.beginPath();
 
-            for (let i = 0; i < bufferLength; i++) {
-              const y = HEIGHT - (dataArray[i] / 256 * HEIGHT);
-
+            freqData.forEach((d, i) => {
               if (i === 0) {
-                canvasCtx.moveTo(x, y);
+                canvasCtx.moveTo(xScale(d.freq), yScale(d.value));
               } else {
-                canvasCtx.lineTo(x, y);
+                canvasCtx.lineTo(xScale(d.freq), yScale(d.value));
               }
-              x += binWidth;
-            }
+            });
 
             canvasCtx.lineTo(WIDTH, HEIGHT);
             canvasCtx.stroke();
@@ -80,14 +95,18 @@
       }
     },
     mounted() {
-      const canvas = this.$el;
+      const canvas = this.$el.getElementsByTagName('canvas')[0];
       canvas.width = canvas.offsetWidth;
 
-      getFFTanalyser().then(this.visualize);
+      select('svg')
+        .append('g')
+        .attr('class', 'axis')
+
+      this.init();
     },
     props: {
       type: {
-        default: 'bar',
+        default: 'line',
         validator(val) {
           return val === 'bar' || val === 'line';
         }
@@ -102,7 +121,7 @@
     },
     watch: {
       fftSize() {
-        getFFTanalyser().then(this.visualize);
+        this.init();
       }
     }
   }
